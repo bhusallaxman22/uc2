@@ -1,0 +1,2 @@
+If customer occupation is student and order total amount is at least 500, then give 10% discount.
+If order total amount is greater than 1000, then grant free shipping.

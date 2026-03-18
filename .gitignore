@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Java build output
+*.class
+out/
+bin/
+target/
+build/
+
+# Logs
+*.log
+
+# IDE settings
+.vscode/
+.idea/
+*.iml
+
+# OS/editor temp files
+*.swp
+*.swo
+*~
