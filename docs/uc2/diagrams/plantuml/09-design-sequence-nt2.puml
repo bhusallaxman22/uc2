@@ -1,0 +1,48 @@
+@startuml
+title UC2 NT-2 Design Sequence (Task 9)
+
+participant "ui:BusinessRuleAppFrame" as ui
+participant "controller:BusinessRuleController" as controller
+participant "cmd:AiUpdateRulesCommand" as cmd
+participant "template:AiRuleUpdateTemplate" as template
+participant "factory:DocumentReaderFactory" as factory
+participant "reader:DocumentReader" as reader
+participant "context:RuleProcessingContext" as context
+participant "extract:RuleExtractionHandler" as extract
+participant "normalize:RuleNormalizationHandler" as normalize
+participant "rank:RuleRankingHandler" as rank
+participant "parseTree:ParseTreeGenerationHandler" as parseTree
+participant "extractor:HeuristicRuleExtractor" as extractor
+participant "creator:RuleCreator" as creator
+participant "parser:ConditionParser" as parser
+participant "expert:BusinessRuleExpert" as expert
+participant "repo:RuleRepository" as repo
+
+ui -> controller : updateWithDocument(path: Path) : RuleUpdateResult
+controller -> cmd : <<create>>(template: AiRuleUpdateTemplate, source: Path)
+controller -> cmd : execute() : RuleUpdateResult
+cmd -> template : executeUpdate(source: Path) : RuleUpdateResult
+template -> template : validateSource(source: Path) : void
+template -> factory : readerFor(path: Path) : DocumentReader
+template -> reader : read(path: Path) : String
+template -> context : <<create>>(documentText: String)
+
+template -> extract : handle(context: RuleProcessingContext) : void
+extract -> extractor : extractRuleStatements(documentText: String) : List<String>
+extract -> normalize : handle(context: RuleProcessingContext) : void
+normalize -> rank : handle(context: RuleProcessingContext) : void
+
+loop for each normalized statement
+  rank -> creator : createFromStatement(statement: String) : BusinessRule
+  creator -> parser : parse(rawCondition: String) : Expression
+end
+
+rank -> expert : validateAndRank(rules: Collection<BusinessRule>) : List<BusinessRule>
+rank -> parseTree : handle(context: RuleProcessingContext) : void
+template -> repo : replaceAll(updatedRules: List<BusinessRule>) : void
+
+template --> cmd : RuleUpdateResult
+cmd --> controller : RuleUpdateResult
+controller --> ui : RuleUpdateResult
+
+@enduml

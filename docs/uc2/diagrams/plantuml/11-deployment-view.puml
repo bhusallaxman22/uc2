@@ -1,0 +1,26 @@
+@startuml
+title UC2 Deployment View (Task 11)
+
+node "User Workstation" as workstation {
+  artifact "Java Runtime"
+  artifact "Swing Desktop Application"
+}
+
+node "UC2 Business Rule Engine Application" as engine {
+  component UI
+  component Controller
+  component Commands
+  component Templates
+  component "Rule Services" as RuleServices
+  component "AI Processing Chain" as AiChain
+  database "In-Memory Repository" as Repo
+}
+
+artifact "Manual Rule Text\nEntered by User" as manualInput
+artifact "Rule Specification Document\n(txt/docx/pdf)" as docInput
+
+workstation --> engine
+manualInput --> engine
+docInput --> engine
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+title UC2 NT-1 Design Sequence (Task 9)
+
+participant "ui:BusinessRuleAppFrame" as ui
+participant "controller:BusinessRuleController" as controller
+participant "cmd:ManualUpdateRulesCommand" as cmd
+participant "template:ManualRuleUpdateTemplate" as template
+participant "creator:RuleCreator" as creator
+participant "parser:ConditionParser" as parser
+participant "expert:BusinessRuleExpert" as expert
+participant "repo:RuleRepository" as repo
+
+ui -> controller : updateManually(rulesText: String)\n: RuleUpdateResult
+controller -> cmd : <<create>>(template: ManualRuleUpdateTemplate,\nrulesText: String)
+controller -> cmd : execute() : RuleUpdateResult
+cmd -> template : executeUpdate(source: String) : RuleUpdateResult
+
+template -> template : validateSource(source: String) : void
+template -> template : buildRules(source: String,\nmessages: List<String>) : List<BusinessRule>
+template -> creator : createFromText(rawRules: String) : List<BusinessRule>
+
+loop for each rule statement
+  creator -> creator : createFromStatement(statement: String) : BusinessRule
+  creator -> parser : parse(rawCondition: String) : Expression
+end
+
+template -> expert : validateAndRank(rules: Collection<BusinessRule>)\n: List<BusinessRule>
+template -> repo : replaceAll(updatedRules: List<BusinessRule>) : void
+
+template --> cmd : RuleUpdateResult
+cmd --> controller : RuleUpdateResult
+controller --> ui : RuleUpdateResult
+
+@enduml

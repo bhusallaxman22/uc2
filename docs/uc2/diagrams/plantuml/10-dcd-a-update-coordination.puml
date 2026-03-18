@@ -1,0 +1,61 @@
+@startuml
+title UC2 Design Class Diagram A: Update Coordination (Task 10)
+
+interface "ApplicationCommand<R>" as ApplicationCommand {
+  +execute(): R
+}
+
+class BusinessRuleController {
+  -repository: RuleRepository
+  -manualUpdateTemplate: ManualRuleUpdateTemplate
+  -aiUpdateTemplate: AiRuleUpdateTemplate
+  -engineService: RuleEngineService
+  +currentRules(): List<BusinessRule>
+  +updateManually(rulesText: String): RuleUpdateResult
+  +updateWithDocument(path: Path): RuleUpdateResult
+  +processRequest(requestText: String): RequestProcessingResult
+  +renderRules(): String
+}
+
+class "ManualUpdateRulesCommand" as ManualUpdateRulesCommand {
+  -template: ManualRuleUpdateTemplate
+  -rulesText: String
+  +execute(): RuleUpdateResult
+}
+
+class "AiUpdateRulesCommand" as AiUpdateRulesCommand {
+  -template: AiRuleUpdateTemplate
+  -source: Path
+  +execute(): RuleUpdateResult
+}
+
+abstract class "RuleUpdateTemplate<T>" as RuleUpdateTemplate {
+  -repository: RuleRepository
+  -expert: BusinessRuleExpert
+  +executeUpdate(source: T): RuleUpdateResult
+  #validateSource(source: T): void
+  #buildRules(source: T, messages: List<String>): List<BusinessRule>
+}
+
+class ManualRuleUpdateTemplate {
+  -creator: RuleCreator
+  #validateSource(source)
+  #buildRules(source, messages)
+}
+
+class AiRuleUpdateTemplate {
+  -readerFactory: DocumentReaderFactory
+  -processingChain: RuleProcessingHandler
+  #validateSource(source)
+  #buildRules(source, messages)
+}
+
+BusinessRuleController --> ApplicationCommand : creates/invokes
+ManualUpdateRulesCommand ..|> ApplicationCommand
+AiUpdateRulesCommand ..|> ApplicationCommand
+ManualUpdateRulesCommand --> ManualRuleUpdateTemplate
+AiUpdateRulesCommand --> AiRuleUpdateTemplate
+RuleUpdateTemplate <|-- ManualRuleUpdateTemplate
+RuleUpdateTemplate <|-- AiRuleUpdateTemplate
+
+@enduml

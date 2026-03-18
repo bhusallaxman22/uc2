@@ -1,0 +1,27 @@
+@startuml
+title UC2 NT-2 Informal Sequence (Task 8)
+
+actor "Actor/UI" as UI
+participant Controller
+participant "AI Command" as AICommand
+participant "AI Template" as AITemplate
+participant "Reader Factory" as ReaderFactory
+participant "Document Reader" as DocumentReader
+participant "Processing Chain" as ProcessingChain
+participant "Rule Creator" as RuleCreator
+participant "Rule Expert" as RuleExpert
+database Repository
+
+UI -> Controller : request AI update
+Controller -> AICommand : create/execute AI command
+AICommand -> AITemplate : ask template to perform AI update
+AITemplate -> ReaderFactory : validate file\nchoose reader
+ReaderFactory -> DocumentReader : ask selected reader to read
+AITemplate -> ProcessingChain : create pipeline context\nstart processing chain
+ProcessingChain -> RuleCreator : extracts, normalizes, ranks,\ngenerates parse-tree messages
+RuleCreator -> RuleExpert : validate and rank
+AITemplate -> Repository : replace stored rules
+AITemplate --> Controller : return update result
+Controller --> UI : show updated rules
+
+@enduml

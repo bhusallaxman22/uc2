@@ -1,0 +1,72 @@
+@startuml
+title UC2 Domain Model (Task 2)
+
+class BusinessAnalyst {
+  analystId
+  name
+  role
+}
+
+class UpdateSession {
+  sessionId
+  updateMode
+  submittedAt
+}
+
+class RuleCatalog {
+  catalogId
+  lastUpdatedAt
+}
+
+class BusinessRule {
+  ruleId
+  sourceText
+  priority
+}
+
+abstract class Condition {
+  conditionText
+}
+
+class AtomicCondition {
+  fieldName
+  operator
+  expectedValue
+}
+
+class CompoundCondition {
+  logicalOperator
+}
+
+class Action {
+  actionText
+}
+
+class RuleSpecificationDocument {
+  documentId
+  fileName
+  fileType
+  rawText
+}
+
+class ParseTree {
+  treeText
+}
+
+class RuleUpdateResult {
+  message
+  status
+}
+
+BusinessAnalyst --> UpdateSession : initiates
+UpdateSession --> RuleCatalog : updates
+RuleCatalog "1" o-- "1..*" BusinessRule : contains
+BusinessRule --> "1" Condition : has
+BusinessRule --> "1..*" Action : triggers
+AtomicCondition --|> Condition
+CompoundCondition --|> Condition
+RuleSpecificationDocument --> UpdateSession : supports
+BusinessRule --> ParseTree : has
+UpdateSession --> RuleUpdateResult : produces
+
+@enduml

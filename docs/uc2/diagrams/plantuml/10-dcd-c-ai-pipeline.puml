@@ -1,0 +1,61 @@
+@startuml
+title UC2 Design Class Diagram C: AI Pipeline and Document Processing (Task 10)
+
+class DocumentReaderFactory {
+  -readers: List<DocumentReader>
+  +readerFor(path: Path): DocumentReader
+}
+
+interface DocumentReader {
+  +supports(path: Path): boolean
+  +read(path: Path): String
+}
+
+class TextDocumentReader
+class DocxDocumentReader
+class PdfDocumentReader
+
+interface RuleProcessingHandler {
+  +setNext(next): RuleProcessingHandler
+  +handle(context: RuleProcessingContext)
+}
+
+abstract class AbstractRuleProcessingHandler {
+  -next: RuleProcessingHandler
+  +setNext(next): RuleProcessingHandler
+  +handle(context: RuleProcessingContext)
+  #process(context): void
+}
+
+class RuleExtractionHandler {
+  -extractor: HeuristicRuleExtractor
+}
+
+class RuleNormalizationHandler
+
+class RuleRankingHandler {
+  -creator: RuleCreator
+  -expert: BusinessRuleExpert
+}
+
+class ParseTreeGenerationHandler
+
+class RuleProcessingContext {
+  -documentText: String
+  -extractedStatements: List<String>
+  -rules: List<BusinessRule>
+  -messages: List<String>
+}
+
+DocumentReaderFactory --> DocumentReader : selects
+TextDocumentReader ..|> DocumentReader
+DocxDocumentReader ..|> DocumentReader
+PdfDocumentReader ..|> DocumentReader
+
+AbstractRuleProcessingHandler ..|> RuleProcessingHandler
+RuleExtractionHandler --|> AbstractRuleProcessingHandler
+RuleNormalizationHandler --|> AbstractRuleProcessingHandler
+RuleRankingHandler --|> AbstractRuleProcessingHandler
+ParseTreeGenerationHandler --|> AbstractRuleProcessingHandler
+
+@enduml

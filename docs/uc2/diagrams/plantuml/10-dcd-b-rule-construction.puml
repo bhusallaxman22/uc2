@@ -1,0 +1,67 @@
+@startuml
+title UC2 Design Class Diagram B: Rule Construction and Interpretation (Task 10)
+
+class RuleCreator {
+  -parser: ConditionParser
+  +createFromText(rawRules: String): List<BusinessRule>
+  +createFromStatement(statement: String): BusinessRule
+}
+
+class BusinessRuleExpert {
+  +validateAndRank(rules): List<BusinessRule>
+  +findMatchingRules(...): List<BusinessRule>
+}
+
+class ConditionParser {
+  +parse(rawCondition: String): Expression
+}
+
+interface RuleRepository {
+  +findAll(): List<BusinessRule>
+  +replaceAll(rules): void
+}
+
+class InMemoryRuleRepository
+
+class BusinessRule {
+  -id: String
+  -sourceText: String
+  -condition: Expression
+  -actions: List<String>
+  -priority: int
+  +specificity(): int
+  +toDisplayString(): String
+  +parseTree(): String
+}
+
+abstract class Expression {
+  +interpret(context): boolean
+  +asRuleString(): String
+  +asTree(indent): String
+  +specificity(): int
+}
+
+class ComparisonExpression {
+  -field: String
+  -operator: ComparisonOperator
+  -expectedValue: String
+}
+
+class AndExpression {
+  -left: Expression
+  -right: Expression
+}
+
+class OrExpression {
+  -left: Expression
+  -right: Expression
+}
+
+RuleCreator --> ConditionParser
+BusinessRule --> Expression : has
+InMemoryRuleRepository ..|> RuleRepository
+ComparisonExpression --|> Expression
+AndExpression --|> Expression
+OrExpression --|> Expression
+
+@enduml

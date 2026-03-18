@@ -1,0 +1,23 @@
+@startuml
+title UC2 NT-1 Informal Sequence (Task 8)
+
+actor "Actor/UI" as UI
+participant Controller
+participant "Manual Command" as ManualCommand
+participant "Manual Template" as ManualTemplate
+participant "Rule Creator" as RuleCreator
+participant "Condition Parser" as ConditionParser
+participant "Rule Expert" as RuleExpert
+database Repository
+
+UI -> Controller : request manual update
+Controller -> ManualCommand : create/execute manual command
+ManualCommand -> ManualTemplate : ask template to perform manual update
+ManualTemplate -> RuleCreator : validate source\ncreate rules from submitted text
+RuleCreator -> ConditionParser : parse each condition
+ManualTemplate -> RuleExpert : validate and rank
+ManualTemplate -> Repository : replace stored rules
+ManualTemplate --> Controller : return update result
+Controller --> UI : show updated rules
+
+@enduml
